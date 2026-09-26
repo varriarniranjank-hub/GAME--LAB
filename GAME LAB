@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JUST PLAY GAMES</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      background: #0f0f13;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(90deg, #1a1a2e, #16213e);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #00ff9d;
+      box-shadow: 0 4px 20px rgba(0, 255, 157, 0.15);
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #00ff9d, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo span {
+      color: #fff;
+      -webkit-text-fill-color: #fff;
+      font-weight: 400;
+      font-size: 0.9rem;
+      margin-left: 8px;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #00ff9d;
+      color: #0f0f13;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    button:hover {
+      background: #00d4ff;
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: #2a2a3a;
+      color: #00ff9d;
+      border: 1px solid #00ff9d;
+    }
+
+    button.secondary:hover {
+      background: #00ff9d;
+      color: #0f0f13;
+    }
+
+    /* Main layout */
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .editor-panel, .preview-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #222;
+    }
+
+    .preview-panel {
+      border-right: none;
+    }
+
+    .panel-header {
+      background: #1a1a2e;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #00ff9d;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    textarea {
+      flex: 1;
+      background: #12121a;
+      color: #e0e0e0;
+      border: none;
+      padding: 16px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+    }
+
+    iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    /* Examples dropdown */
+    select {
+      background: #2a2a3a;
+      color: #00ff9d;
+      border: 1px solid #00ff9d;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main {
+        flex-direction: column;
+      }
+      .editor-panel, .preview-panel {
+        height: 50%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">JUST PLAY GAMES <span>HTML Game Playground</span></div>
+    <div class="toolbar">
+      <select id="exampleSelect" onchange="loadExample()">
+        <option value="">Load Example Game...</option>
+        <option value="clicker">1. Clicker Game</option>
+        <option value="catch">2. Catch the Ball</option>
+        <option value="snake">3. Mini Snake</option>
+      </select>
+      <button onclick="runCode()">▶ Run Game</button>
+      <button class="secondary" onclick="clearCode()">Clear</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Editor -->
+    <div class="editor-panel">
+      <div class="panel-header">
+        <span>HTML / CSS / JS Code</span>
+        <span style="font-size:0.75rem; opacity:0.7;">Write your game here</span>
+      </div>
+      <textarea id="codeEditor" spellcheck="false" placeholder="Paste or write your HTML game code here..."></textarea>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-panel">
+      <div class="panel-header">
+        <span>Live Game Preview</span>
+        <button class="secondary" style="padding:4px 10px; font-size:0.8rem;" onclick="toggleFullscreen()">Fullscreen</button>
+      </div>
+      <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // Default starter code
+    const starterCode = `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1a1a2e;
+      color: white;
+      font-family: sans-serif;
+      flex-direction: column;
+      gap: 20px;
+    }
+    h1 { color: #00ff9d; }
+    button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      background: #00ff9d;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to JUST PLAY GAMES</h1>
+  <p>Edit the code on the left and click "Run Game"</p>
+  <button onclick="alert('You made a game!')">Click Me!</button>
+</body>
+</html>`;
+
+    // Example Games
+    const examples = {
+      clicker: `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0; height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      background: linear-gradient(135deg, #0f0c29, #302b63);
+      color: white; font-family: sans-serif;
+    }
+    h1 { color: #00ff9d; margin-bottom: 10px; }
+    #score { font-size: 3rem; margin: 20px 0; }
+    button {
+      padding: 20px 40px; font-size: 1.5rem;
+      background: #00ff9d; border: none;
+      border-radius: 12px; cursor: pointer;
+      font-weight: bold; transition: transform 0.1s;
+    }
+    button:active { transform: scale(0.95); }
+  </style>
+</head>
+<body>
+  <h1>CLICKER GAME</h1>
+  <div id="score">0</div>
+  <button onclick="clickMe()">CLICK!</button>
+  <script>
+    let score = 0;
+    function clickMe() {
+      score++;
+      document.getElementById('score').innerText = score;
+    }
+  <\/script>
+</body>
+</html>`,
+
+      catch: `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; overflow: hidden; background: #0f0f13; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let score = 0;
+    let basket = { x: canvas.width/2 - 40, y: canvas.height - 40, w: 80, h: 20 };
+    let ball = { x: Math.random()*canvas.width, y: 0, r: 15, speed: 4 };
+
+    function draw() {
+      ctx.fillStyle = '#0f0f13';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Basket
+      ctx.fillStyle = '#00ff9d';
+      ctx.fillRect(basket.x, basket.y, basket.w, basket.h);
+
+      // Ball
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+      ctx.fillStyle = '#ff6b6b';
+      ctx.fill();
+
+      // Score
+      ctx.fillStyle = 'white';
+      ctx.font = '24px sans-serif';
+      ctx.fillText('Score: ' + score, 20, 40);
+
+      ball.y += ball.speed;
+
+      // Catch
+      if (ball.y + ball.r > basket.y &&
+          ball.x > basket.x && ball.x < basket.x + basket.w) {
+        score++;
+        ball.y = 0;
+        ball.x = Math.random() * canvas.width;
+        ball.speed += 0.2;
+      }
+
+      // Miss
+      if (ball.y > canvas.height) {
+        ball.y = 0;
+        ball.x = Math.random() * canvas.width;
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('mousemove', e => {
+      basket.x = e.clientX - basket.w/2;
+    });
+
+    draw();
+  <\/script>
+</body>
+</html>`,
+
+      snake: `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0; height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      background: #0f0f13; flex-direction: column; color: white;
+      font-family: sans-serif;
+    }
+    canvas { border: 3px solid #00ff9d; background: #1a1a2e; }
+    h2 { color: #00ff9d; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h2>MINI SNAKE</h2>
+  <p>Use Arrow Keys</p>
+  <canvas id="game" width="400" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const grid = 20;
+    let snake = [{x: 10, y: 10}];
+    let food = {x: 15, y: 15};
+    let dx = 1, dy = 0;
+    let score = 0;
+
+    function draw() {
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, 400, 400);
+
+      // Snake
+      ctx.fillStyle = '#00ff9d';
+      snake.forEach(s => ctx.fillRect(s.x*grid, s.y*grid, grid-2, grid-2));
+
+      // Food
+      ctx.fillStyle = '#ff6b6b';
+      ctx.fillRect(food.x*grid, food.y*grid, grid-2, grid-2);
+
+      // Move
+      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+      } else {
+        snake.pop();
+      }
+
+      // Walls
+      if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
+        snake = [{x:10,y:10}]; dx=1; dy=0; score=0;
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp' && dy !== 1) { dx=0; dy=-1; }
+      if (e.key === 'ArrowDown' && dy !== -1) { dx=0; dy=1; }
+      if (e.key === 'ArrowLeft' && dx !== 1) { dx=-1; dy=0; }
+      if (e.key === 'ArrowRight' && dx !== -1) { dx=1; dy=0; }
+    });
+
+    setInterval(draw, 120);
+  <\/script>
+</body>
+</html>`
+    };
+
+    // Load starter code
+    document.getElementById('codeEditor').value = starterCode;
+    runCode();
+
+    function runCode() {
+      const code = document.getElementById('codeEditor').value;
+      const iframe = document.getElementById('preview');
+      iframe.srcdoc = code;
+    }
+
+    function clearCode() {
+      document.getElementById('codeEditor').value = '';
+      document.getElementById('preview').srcdoc = '';
+    }
+
+    function loadExample() {
+      const value = document.getElementById('exampleSelect').value;
+      if (value && examples[value]) {
+        document.getElementById('codeEditor').value = examples[value];
+        runCode();
+      }
+    }
+
+    function toggleFullscreen() {
+      const iframe = document.getElementById('preview');
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      }
+    }
+
+    // Auto-run when typing (optional - delayed)
+    let timeout;
+    document.getElementById('codeEditor').addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(runCode, 800); // runs 0.8s after you stop typing
+    });
+  </script>
+</body>
+</html>
